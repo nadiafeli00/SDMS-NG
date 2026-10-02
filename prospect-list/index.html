@@ -11,7 +11,7 @@ html,body{height:100%;background:#16181d}
 iframe{width:100%;height:100%;border:0;background:#ececec}
 #p2 iframe{background:#16181d}
 </style></head><body>
-<div class="bar"><button id="b1" class="on">UI</button><button id="b2">Specprog</button></div>
+<div class="bar"><button id="b1" class="on">UI</button><button id="b2">Specprog</button><button id="b3">Database</button></div>
 <div class="pane on" id="p1"><iframe title="UI" srcdoc="<!doctype html>
 <html lang=&quot;id&quot;><head><meta charset=&quot;utf-8&quot;><title>Prospect List</title>
 <style>
@@ -164,8 +164,8 @@ code{background:#22304a;color:#7fb2ff;padding:1px 5px;border-radius:4px}
 <tbody>
 <tr><td>BTN-EXPORT</td><td>Button</td><td>Mendownload data dalam format file Excel</td><td>Hanya <b>Export All</b>: export seluruh data yang ditampilkan baik default awal maupun data yang dari filter atau dari pencarian.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>TXT-SEARCH</td><td>Text Field</td><td>Mencari data berdasarkan Nama atau No HP</td><td>Diletakkan di pojok kanan atas, di sebelah kiri tombol Export.<br>Pencarian dimulai dari <b>Nama</b> (atau No HP) terlebih dahulu, kemudian hasilnya dapat difilter berdasarkan <b>Source</b>, atau Nama dan Source digabung dalam satu pencarian.<br>Binding: <b>trxsuspect.suspectname</b> dan <b>trxsuspect.phonenumbernormalized</b>.<br>Placeholder: &quot;Search by Customer Name, No HP&quot;.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
-<tr><td>DT-FROM</td><td>Date Picker</td><td>Filter tanggal awal pembuatan status Prospect</td><td>Format dd-mm-yyyy.<br>Tidak boleh lebih besar dari Date Thru.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
-<tr><td>DT-THRU</td><td>Date Picker</td><td>Filter tanggal akhir pembuatan status Prospect</td><td>Format dd-mm-yyyy.<br>Tidak boleh lebih kecil dari Date From.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>DT-FROM</td><td>Date Picker</td><td>Filter tanggal awal pembuatan status Prospect</td><td>Format dd-mm-yyyy.<br>Tidak boleh lebih besar dari Date Thru.<br>Binding filter: <b>trxprospect.createddatetime</b> lebih besar atau sama dengan Date From (tabel <b>trxprospect</b> masih usulan, lihat trxprospect.sql).</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>DT-THRU</td><td>Date Picker</td><td>Filter tanggal akhir pembuatan status Prospect</td><td>Format dd-mm-yyyy.<br>Tidak boleh lebih kecil dari Date From.<br>Binding filter: <b>trxprospect.createddatetime</b> kurang dari atau sama dengan Date Thru (sampai akhir hari). Tabel <b>trxprospect</b> masih usulan.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>DD-SOURCE</td><td>Dropdown (LOV)</td><td>Memfilter data berdasarkan Source Prospect</td><td>Label &quot;Source&quot; ditampilkan di atas dropdown.<br>LOV dari tabel <b>mstsourceprospect</b>, tampilkan kolom <b>sourceprodesc</b>.<br>Binding filter: <b>trxsuspect.sourceprospectid = mstsourceprospect.id</b>.<br>Default: Semua.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>DD-PLATFORM</td><td>Dropdown (LOV)</td><td>Memfilter data berdasarkan Platform</td><td>Label &quot;Platform&quot; ditampilkan di atas dropdown.<br>LOV dari tabel <b>mstplatformdata</b>, tampilkan kolom <b>platformdesc</b>.<br>Binding filter: <b>trxsuspectmd.dataplatform</b> (join <b>trxsuspectmd.idsuspect = trxsuspect.id</b>).<br>Default: Semua.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>DD-CATEGORY</td><td>Dropdown (LOV)</td><td>Memfilter data Inbound / Outbound</td><td>Label &quot;Category&quot; ditampilkan di atas dropdown.<br>LOV hanya 2 pilihan: <b>Inbound</b> dan <b>Outbound</b>.<br>Binding filter: <b>trxsuspectmd.inoutbound</b> (join <b>trxsuspectmd.idsuspect = trxsuspect.id</b>).<br>Default: Semua.</td><td></td><td>TBD</td><td>GET</td><td></td><td></td><td></td><td></td></tr>
@@ -187,11 +187,104 @@ code{background:#22304a;color:#7fb2ff;padding:1px 5px;border-radius:4px}
 </tbody></table></div>
 <div class=&quot;n&quot;><p>Simulasi memakai tanggal follow up (start) 13 Mei 2026.</p>
 <p>Batas tanggal dibuat agar logic auto drop SDMS berjalan: kategori tidak boleh bertentangan dengan tanggal Rencana Beli yang dipilih.</p>
-<p><b>Perlu konfirmasi:</b> (1) Default Hot di sheet tertulis &quot;2 minggu = 27 Mei&quot;, sedangkan &quot;+1 minggu (7 hari)&quot; = 20 Mei; spec ini memakai 20 Mei. (2) Batas bawah input Hot tertulis 20 Mei di satu baris dan &quot;di atas 13 Mei&quot; di baris lain; spec ini memakai 13 Mei. (3) Tanggal batas (27 Mei dan 10 Juni) muncul di dua kategori; spec ini memasukkannya ke kategori yang lebih tinggi untuk Hot (27 Mei) dan Medium (10 Juni). (4) Tanggal follow up terakhir diambil dari trxfollowup.createddatetime. (5) Nilai trxsuspectmd.dataplatform belum bisa dipastikan menyimpan platformcode atau platformdesc (belum ada datanya). (6) Di database yang dicek, trxfollowup.tgl_rencana_beli belum terisi, jadi aturan Low/Medium/Hot belum diuji dengan data. (7) API Endpoint = TBD; Status QC/Dev/BA dan Last Update dikosongkan.</p></div>
+<p><b>Perlu konfirmasi:</b> (1) Default Hot di sheet tertulis &quot;2 minggu = 27 Mei&quot;, sedangkan &quot;+1 minggu (7 hari)&quot; = 20 Mei; spec ini memakai 20 Mei. (2) Batas bawah input Hot tertulis 20 Mei di satu baris dan &quot;di atas 13 Mei&quot; di baris lain; spec ini memakai 13 Mei. (3) Tanggal batas (27 Mei dan 10 Juni) muncul di dua kategori; spec ini memasukkannya ke kategori yang lebih tinggi untuk Hot (27 Mei) dan Medium (10 Juni). (4) Tanggal follow up terakhir diambil dari trxfollowup.createddatetime. (5) Nilai trxsuspectmd.dataplatform belum bisa dipastikan menyimpan platformcode atau platformdesc (belum ada datanya). (6) Di database yang dicek, trxfollowup.tgl_rencana_beli belum terisi, jadi aturan Low/Medium/Hot belum diuji dengan data. (7) Tabel trxprospect masih usulan (lihat trxprospect.sql); mpmidtl/namatl (Team Leader) belum ada di mappingslskorkcb. (8) API Endpoint = TBD; Status QC/Dev/BA dan Last Update dikosongkan.</p></div>
 </div></body></html>
 "></iframe></div>
+<div class="pane" id="p3"><iframe title="Database" srcdoc="<!doctype html>
+<html lang=&quot;id&quot;><head><meta charset=&quot;utf-8&quot;><title>Database Prospect List</title>
+<style>
+*{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif}
+body{margin:0;background:#16181d;color:#e6e6e6;font-size:14px;line-height:1.5}
+.wrap{max-width:1500px;margin:0 auto;padding:32px 36px 60px}
+.bc{color:#9aa0aa;font-size:13px;margin-bottom:24px}
+h1{font-size:34px;margin:0 0 6px;color:#fff}
+h3{font-size:19px;margin:34px 0 10px;color:#fff}
+p{margin:0 0 10px;color:#cfd3da}
+code{background:#22304a;color:#7fb2ff;padding:2px 7px;border-radius:5px;font-size:13px}
+.bd{font-size:11px;background:#f26a10;color:#fff;border-radius:10px;padding:2px 9px;margin-left:6px;vertical-align:middle}
+blockquote{margin:0 0 14px;padding:6px 0 6px 20px;border-left:3px solid #3a3f4a;color:#e6e6e6}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{border:1px solid #2c2f36;padding:8px 12px;text-align:left;vertical-align:top}
+th{background:#1d2026;color:#9aa0aa;font-weight:600;white-space:nowrap}
+td:first-child{white-space:nowrap}
+</style></head><body><div class=&quot;wrap&quot;>
+<div class=&quot;bc&quot;>Prospect Management / Prospect List</div>
+<h1>Database</h1>
+<p>Model database untuk menu Prospect List. Database: PostgreSQL <code>SNEMESIAGEN_PROSPECT</code>. Setiap tabel wajib memiliki 6 kolom audit: <code>createdby</code>, <code>createddatetime</code>, <code>modifiedby</code>, <code>modifieddatetime</code>, <code>deletedby</code>, <code>deleteddatetime</code>.</p>
+<h3>Tabel Prospect <code>trxprospect</code> <span class=&quot;bd&quot;>Usulan</span></h3>
+<blockquote>Menyimpan data prospect, hasil dari suspect yang sudah di-follow up. Kategori Hot, Medium, dan Low tidak disimpan, tetapi dihitung dari tanggal rencana beli di trxfollowup. Tabel ini masih usulan (lihat trxprospect.sql).</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>idtrxsuspect</td><td>UUID</td><td>Relasi ke trxsuspect.id. Satu prospect aktif per suspect (flow: suspect, follow up, prospect)</td><td>Prospect List</td><td>Card Prospect</td><td>Card List</td></tr>
+<tr><td>prospectnumber</td><td>varchar (30)</td><td>Nomor prospect</td><td></td><td></td><td></td></tr>
+<tr><td>statusid</td><td>UUID</td><td>Id status siklus hidup prospect</td><td></td><td></td><td></td></tr>
+<tr><td>statuscode</td><td>varchar (64)</td><td>Kode status: Draft, Cancel, Completed, Request Drop TL, Request Drop Korsal, Completed Drop</td><td></td><td></td><td></td></tr>
+<tr><td>statusdesc</td><td>varchar (128)</td><td>Deskripsi status</td><td></td><td></td><td></td></tr>
+<tr><td>iddealer</td><td>UUID</td><td>Id dealer</td><td></td><td></td><td></td></tr>
+<tr><td>transdealercode</td><td>varchar (64)</td><td>Kode dealer transaksi</td><td></td><td></td><td></td></tr>
+<tr><td>dealercodemd</td><td>varchar (32)</td><td>Kode dealer MD</td><td></td><td></td><td></td></tr>
+<tr><td>idmappingsls</td><td>UUID</td><td>Id mapping salesman</td><td></td><td></td><td></td></tr>
+<tr><td>mpmidflp</td><td>varchar (20)</td><td>Id FLP MPM salesman, dipakai membatasi data sesuai login Salesman</td><td></td><td></td><td></td></tr>
+<tr><td>ahmidflp</td><td>varchar (20)</td><td>Id FLP AHM salesman</td><td></td><td></td><td></td></tr>
+<tr><td>namasls</td><td>varchar (100)</td><td>Nama salesman</td><td></td><td></td><td></td></tr>
+<tr><td>mpmidtl</td><td>varchar (20)</td><td>Id Team Leader (kolom baru; belum ada di mappingslskorkcb)</td><td></td><td></td><td></td></tr>
+<tr><td>namatl</td><td>varchar (100)</td><td>Nama Team Leader (kolom baru)</td><td></td><td></td><td></td></tr>
+<tr><td>mpmidkorsls</td><td>varchar (20)</td><td>Id Korsal</td><td></td><td></td><td></td></tr>
+<tr><td>namakorsls</td><td>varchar (100)</td><td>Nama Korsal</td><td></td><td></td><td></td></tr>
+<tr><td>createdby</td><td>varchar (32)</td><td>Pembuat data</td><td></td><td></td><td></td></tr>
+<tr><td>createddatetime</td><td>timestamp</td><td>Tanggal dan waktu data dibuat (default now())</td><td>Prospect List</td><td>Date From, Date Thru</td><td>Filter</td></tr>
+<tr><td>modifiedby</td><td>varchar (32)</td><td>Pengubah data terakhir</td><td></td><td></td><td></td></tr>
+<tr><td>modifieddatetime</td><td>timestamp</td><td>Tanggal dan waktu data diubah (default 1900-01-01)</td><td></td><td></td><td></td></tr>
+<tr><td>deletedby</td><td>varchar (32)</td><td>Penghapus data</td><td></td><td></td><td></td></tr>
+<tr><td>deleteddatetime</td><td>timestamp</td><td>Soft delete: 1900-01-01 berarti belum dihapus</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3>Tabel Suspect <code>trxsuspect</code></h3>
+<blockquote>Data suspect yang menjadi dasar prospect. Hanya kolom yang dipakai halaman Prospect List yang ditampilkan.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>suspectname</td><td>varchar (128)</td><td>Nama suspect / customer</td><td>Prospect List</td><td>Search, Nama di card</td><td>Filter, Card List</td></tr>
+<tr><td>suspectphonenumber</td><td>varchar (32)</td><td>No HP suspect</td><td>Prospect List</td><td>Search, No HP di card</td><td>Filter, Card List</td></tr>
+<tr><td>phonenumbernormalized</td><td>varchar (32)</td><td>No HP yang sudah dinormalisasi, dipakai untuk pencarian</td><td>Prospect List</td><td>Search</td><td>Filter</td></tr>
+<tr><td>sourceprospectid</td><td>UUID</td><td>Relasi ke mstsourceprospect.id</td><td>Prospect List</td><td>Source</td><td>Filter</td></tr>
+<tr><td>createddatetime</td><td>timestamp</td><td>Tanggal data dibuat</td><td></td><td></td><td></td></tr>
+<tr><td>deleteddatetime</td><td>timestamp</td><td>Soft delete: 1900-01-01 berarti belum dihapus</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3>Tabel Follow Up <code>trxfollowup</code></h3>
+<blockquote>Menyimpan hasil follow up suspect. Dipakai untuk menentukan tab New, Low, Medium, Hot. Hanya kolom yang dipakai halaman ini yang ditampilkan.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>idtrxsuspect</td><td>UUID</td><td>Relasi ke trxsuspect.id</td><td></td><td></td><td></td></tr>
+<tr><td>createddatetime</td><td>timestamp</td><td>Tanggal follow up (follow up terakhir = data terbaru per suspect)</td><td>Prospect List</td><td>Tab Low, Medium, Hot</td><td>Tab</td></tr>
+<tr><td>tgl_rencana_beli</td><td>timestamp</td><td>Tanggal rencana pembelian</td><td>Prospect List</td><td>Tab Low, Medium, Hot</td><td>Tab</td></tr>
+<tr><td>date_next_fu</td><td>timestamp</td><td>Tanggal follow up berikutnya, untuk urutan hari ini dan Overdue</td><td>Prospect List</td><td>Urutan list</td><td>Card List</td></tr>
+<tr><td>deleteddatetime</td><td>timestamp</td><td>Soft delete: 1900-01-01 berarti belum dihapus</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3>Tabel Suspect MD <code>trxsuspectmd</code></h3>
+<blockquote>Data tambahan suspect dari MD (platform dan inbound/outbound). Hanya kolom yang dipakai halaman ini yang ditampilkan.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>idsuspect</td><td>UUID</td><td>Relasi ke trxsuspect.id</td><td></td><td></td><td></td></tr>
+<tr><td>dataplatform</td><td>varchar</td><td>Platform asal data (dibandingkan dengan mstplatformdata)</td><td>Prospect List</td><td>Platform</td><td>Filter</td></tr>
+<tr><td>inoutbound</td><td>varchar</td><td>Inbound / Outbound</td><td>Prospect List</td><td>Category</td><td>Filter</td></tr>
+</tbody></table></div>
+<h3>Tabel Master Source Prospect <code>mstsourceprospect</code></h3>
+<blockquote>LOV untuk filter Source.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>sourceprodesc</td><td>varchar (250)</td><td>Deskripsi source prospect, tampil di dropdown</td><td>Prospect List</td><td>Source</td><td>Filter</td></tr>
+<tr><td>isactive</td><td>boolean</td><td>Status aktif</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3>Tabel Master Platform <code>mstplatformdata</code></h3>
+<blockquote>LOV untuk filter Platform.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>platformcode</td><td>varchar (25)</td><td>Kode platform</td><td></td><td></td><td></td></tr>
+<tr><td>platformdesc</td><td>varchar (250)</td><td>Deskripsi platform, tampil di dropdown</td><td>Prospect List</td><td>Platform</td><td>Filter</td></tr>
+</tbody></table></div>
+
+</div></body></html>"></iframe></div>
 <script>
-function go(n){for(var i=1;i<=2;i++){document.getElementById("p"+i).classList.toggle("on",i==n);document.getElementById("b"+i).classList.toggle("on",i==n)}location.hash=n==2?"specprog":"ui"}
-document.getElementById("b1").onclick=function(){go(1)};document.getElementById("b2").onclick=function(){go(2)};
-if(location.hash=="#specprog")go(2);
+function go(n){for(var i=1;i<=3;i++){document.getElementById("p"+i).classList.toggle("on",i==n);document.getElementById("b"+i).classList.toggle("on",i==n)}location.hash=n==3?"database":n==2?"specprog":"ui"}
+document.getElementById("b1").onclick=function(){go(1)};document.getElementById("b2").onclick=function(){go(2)};document.getElementById("b3").onclick=function(){go(3)};
+if(location.hash=="#specprog")go(2);if(location.hash=="#database")go(3);
 </script></body></html>
