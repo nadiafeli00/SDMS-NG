@@ -217,7 +217,7 @@ td:first-child{white-space:nowrap}
 <div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
 <tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
 <tr><td>idtrxsuspect</td><td>UUID</td><td>Relasi ke trxsuspect.id. Satu prospect aktif per suspect (flow: suspect, follow up, prospect)</td><td>Prospect List</td><td>Card Prospect</td><td>Card List</td></tr>
-<tr><td>prospectnumber</td><td>varchar (30)</td><td>Nomor prospect</td><td></td><td></td><td></td></tr>
+<tr><td>prospectnumber</td><td>varchar (30)</td><td>Nomor prospect dengan format : [idinternal]-IDPRO-[Tahun]-DMS[runningnumber], ex : 028-IDPRO-2019-DMS00001277</td><td></td><td></td><td></td></tr>
 <tr><td>statusid</td><td>UUID</td><td>Relasi ke mstgeneralvalue.id (group STATUSSUSPECT)</td><td></td><td></td><td></td></tr>
 <tr><td>statuscode</td><td>varchar (64)</td><td>Salinan mstgeneralvalue.code: 10 Draft, 13 Cancel, 17 Complete, 54 Request Drop TL, 55 Request Drop Korsal, 56 Completed Drop</td><td></td><td></td><td></td></tr>
 <tr><td>statusdesc</td><td>varchar (128)</td><td>Salinan mstgeneralvalue.name</td><td></td><td></td><td></td></tr>
