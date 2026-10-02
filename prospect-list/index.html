@@ -186,8 +186,6 @@ code{background:#22304a;color:#7fb2ff;padding:1px 5px;border-radius:4px}
 <tr><td>Low</td><td>Lebih dari 4 minggu (lebih dari 28 hari)</td><td>Tgl follow up + 35 hari</td><td>Mulai tgl follow up + 28 hari</td><td>Default 17 Juni 2026; bisa dipilih mulai 10 Juni 2026</td></tr>
 </tbody></table></div>
 <div class=&quot;n&quot;><p>Simulasi memakai tanggal follow up (start) 13 Mei 2026.</p>
-<p>Batas tanggal dibuat agar logic auto drop SDMS berjalan: kategori tidak boleh bertentangan dengan tanggal Rencana Beli yang dipilih.</p>
-<p><b>Perlu konfirmasi:</b> (1) Default Hot di sheet tertulis &quot;2 minggu = 27 Mei&quot;, sedangkan &quot;+1 minggu (7 hari)&quot; = 20 Mei; spec ini memakai 20 Mei. (2) Batas bawah input Hot tertulis 20 Mei di satu baris dan &quot;di atas 13 Mei&quot; di baris lain; spec ini memakai 13 Mei. (3) Tanggal batas (27 Mei dan 10 Juni) muncul di dua kategori; spec ini memasukkannya ke kategori yang lebih tinggi untuk Hot (27 Mei) dan Medium (10 Juni). (4) Tanggal follow up terakhir diambil dari trxfollowup.createddatetime. (5) Nilai trxsuspectmd.dataplatform belum bisa dipastikan menyimpan platformcode atau platformdesc (belum ada datanya). (6) Di database yang dicek, trxfollowup.tgl_rencana_beli belum terisi, jadi aturan Low/Medium/Hot belum diuji dengan data. (7) Tabel trxprospect masih usulan (lihat trxprospect.sql); mpmidtl/namatl (Team Leader) belum ada di mappingslskorkcb. (8) API Endpoint = TBD; Status QC/Dev/BA dan Last Update dikosongkan.</p></div>
 </div></body></html>
 "></iframe></div>
 <div class="pane" id="p3"><iframe title="Database" srcdoc="<!doctype html>
