@@ -186,6 +186,8 @@ code{background:#22304a;color:#7fb2ff;padding:1px 5px;border-radius:4px}
 <tr><td>Low</td><td>Lebih dari 4 minggu (lebih dari 28 hari)</td><td>Tgl follow up + 35 hari</td><td>Mulai tgl follow up + 28 hari</td><td>Default 17 Juni 2026; bisa dipilih mulai 10 Juni 2026</td></tr>
 </tbody></table></div>
 <div class=&quot;n&quot;><p>Simulasi memakai tanggal follow up (start) 13 Mei 2026.</p>
+<p>Batas tanggal dibuat agar logic auto drop SDMS berjalan: kategori tidak boleh bertentangan dengan tanggal Rencana Beli yang dipilih.</p>
+<p><b>Perlu konfirmasi:</b> (1) Default Hot di sheet tertulis &quot;2 minggu = 27 Mei&quot;, sedangkan &quot;+1 minggu (7 hari)&quot; = 20 Mei; spec ini memakai 20 Mei. (2) Batas bawah input Hot tertulis 20 Mei di satu baris dan &quot;di atas 13 Mei&quot; di baris lain; spec ini memakai 13 Mei. (3) Tanggal batas (27 Mei dan 10 Juni) muncul di dua kategori; spec ini memasukkannya ke kategori yang lebih tinggi untuk Hot (27 Mei) dan Medium (10 Juni). (4) Tanggal follow up terakhir diambil dari trxfollowup.createddatetime. (5) Nilai trxsuspectmd.dataplatform belum bisa dipastikan menyimpan platformcode atau platformdesc (belum ada datanya). (6) Di database yang dicek, trxfollowup.tgl_rencana_beli belum terisi, jadi aturan Low/Medium/Hot belum diuji dengan data. (7) Tabel trxprospect masih usulan (lihat trxprospect.sql); mpmidtl/namatl (Team Leader) belum ada di mappingslskorkcb. (8) Status pada trxprospect mengarah ke mstgeneralvalue (group STATUSSUSPECT); kode 54, 55, 56 belum ada dan diusulkan (lihat mstgeneralvalue-status.sql). Di data lama 51 = Low dan 53 = Hot, sedangkan di PostgreSQL 51 = Hot dan 53 = Low; perlu diperhatikan saat migrasi. (9) API Endpoint = TBD; Status QC/Dev/BA dan Last Update dikosongkan.</p></div>
 </div></body></html>
 "></iframe></div>
 <div class="pane" id="p3"><iframe title="Database" srcdoc="<!doctype html>
@@ -216,9 +218,9 @@ td:first-child{white-space:nowrap}
 <tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
 <tr><td>idtrxsuspect</td><td>UUID</td><td>Relasi ke trxsuspect.id. Satu prospect aktif per suspect (flow: suspect, follow up, prospect)</td><td>Prospect List</td><td>Card Prospect</td><td>Card List</td></tr>
 <tr><td>prospectnumber</td><td>varchar (30)</td><td>Nomor prospect</td><td></td><td></td><td></td></tr>
-<tr><td>statusid</td><td>UUID</td><td>Id status siklus hidup prospect</td><td></td><td></td><td></td></tr>
-<tr><td>statuscode</td><td>varchar (64)</td><td>Kode status: Draft, Cancel, Completed, Request Drop TL, Request Drop Korsal, Completed Drop</td><td></td><td></td><td></td></tr>
-<tr><td>statusdesc</td><td>varchar (128)</td><td>Deskripsi status</td><td></td><td></td><td></td></tr>
+<tr><td>statusid</td><td>UUID</td><td>Relasi ke mstgeneralvalue.id (group STATUSSUSPECT)</td><td></td><td></td><td></td></tr>
+<tr><td>statuscode</td><td>varchar (64)</td><td>Salinan mstgeneralvalue.code: 10 Draft, 13 Cancel, 17 Complete, 54 Request Drop TL, 55 Request Drop Korsal, 56 Completed Drop</td><td></td><td></td><td></td></tr>
+<tr><td>statusdesc</td><td>varchar (128)</td><td>Salinan mstgeneralvalue.name</td><td></td><td></td><td></td></tr>
 <tr><td>iddealer</td><td>UUID</td><td>Id dealer</td><td></td><td></td><td></td></tr>
 <tr><td>transdealercode</td><td>varchar (64)</td><td>Kode dealer transaksi</td><td></td><td></td><td></td></tr>
 <tr><td>dealercodemd</td><td>varchar (32)</td><td>Kode dealer MD</td><td></td><td></td><td></td></tr>
@@ -280,6 +282,49 @@ td:first-child{white-space:nowrap}
 <tr><td>platformdesc</td><td>varchar (250)</td><td>Deskripsi platform, tampil di dropdown</td><td>Prospect List</td><td>Platform</td><td>Filter</td></tr>
 </tbody></table></div>
 
+<h3>Tabel Master General Value Group <code>mstgeneralvaluegroup</code></h3>
+<blockquote>Group untuk nilai master umum. Semua status mengarah ke dua tabel general value; group yang dipakai: STATUSSUSPECT.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>code</td><td>varchar (64)</td><td>Kode group, mis. STATUSSUSPECT</td><td></td><td></td><td></td></tr>
+<tr><td>name</td><td>varchar (32)</td><td>Nama group, mis. Status Suspect</td><td></td><td></td><td></td></tr>
+<tr><td>createdby</td><td>varchar (32)</td><td>Pembuat data</td><td></td><td></td><td></td></tr>
+<tr><td>createddatetime</td><td>timestamp</td><td>Tanggal dan waktu data dibuat (default now())</td><td></td><td></td><td></td></tr>
+<tr><td>modifiedby</td><td>varchar (32)</td><td>Pengubah data terakhir</td><td></td><td></td><td></td></tr>
+<tr><td>modifieddatetime</td><td>timestamp</td><td>Tanggal dan waktu data diubah (default 1900-01-01)</td><td></td><td></td><td></td></tr>
+<tr><td>deletedby</td><td>varchar (32)</td><td>Penghapus data</td><td></td><td></td><td></td></tr>
+<tr><td>deleteddatetime</td><td>timestamp</td><td>Soft delete: 1900-01-01 berarti belum dihapus</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3>Tabel Master General Value <code>mstgeneralvalue</code></h3>
+<blockquote>Nilai master umum per group. Status pada trxsuspect dan trxprospect disimpan sebagai statusid yang mengarah ke tabel ini.</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kolom</th><th>Tipe data</th><th>Keterangan</th><th>Menu</th><th>Nama Field</th><th>Section</th></tr></thead><tbody>
+<tr><td>id</td><td>UUID / PK</td><td>Primary Key, Unique Number</td><td></td><td></td><td></td></tr>
+<tr><td>code</td><td>varchar (64)</td><td>Kode nilai, mis. 10</td><td></td><td></td><td></td></tr>
+<tr><td>name</td><td>varchar (32)</td><td>Deskripsi nilai, mis. Draft</td><td></td><td></td><td></td></tr>
+<tr><td>ordernumber</td><td>int</td><td>Urutan tampil</td><td></td><td></td><td></td></tr>
+<tr><td>genvaluegroupid</td><td>UUID</td><td>Relasi ke mstgeneralvaluegroup.id</td><td></td><td></td><td></td></tr>
+<tr><td>createdby</td><td>varchar (32)</td><td>Pembuat data</td><td></td><td></td><td></td></tr>
+<tr><td>createddatetime</td><td>timestamp</td><td>Tanggal dan waktu data dibuat (default now())</td><td></td><td></td><td></td></tr>
+<tr><td>modifiedby</td><td>varchar (32)</td><td>Pengubah data terakhir</td><td></td><td></td><td></td></tr>
+<tr><td>modifieddatetime</td><td>timestamp</td><td>Tanggal dan waktu data diubah (default 1900-01-01)</td><td></td><td></td><td></td></tr>
+<tr><td>deletedby</td><td>varchar (32)</td><td>Penghapus data</td><td></td><td></td><td></td></tr>
+<tr><td>deleteddatetime</td><td>timestamp</td><td>Soft delete: 1900-01-01 berarti belum dihapus</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3>Daftar Status Group <code>STATUSSUSPECT</code> <span class=&quot;bd&quot;>Sebagian usulan</span></h3>
+<blockquote>Isi mstgeneralvalue untuk group STATUSSUSPECT. Nilai 54, 55, 56 belum ada dan diusulkan (lihat mstgeneralvalue-status.sql).</blockquote>
+<div class=&quot;tw&quot;><table><thead><tr><th>Kode</th><th>Deskripsi</th><th>Urutan</th><th>Keterangan</th></tr></thead><tbody>
+<tr><td>00</td><td>Suspect Drop</td><td>1</td><td>Sudah ada</td></tr>
+<tr><td>10</td><td>Draft</td><td>2</td><td>Sudah ada</td></tr>
+<tr><td>11</td><td>SPK</td><td>3</td><td>Sudah ada</td></tr>
+<tr><td>13</td><td>Cancel</td><td>4</td><td>Sudah ada</td></tr>
+<tr><td>17</td><td>Complete</td><td>5</td><td>Sudah ada</td></tr>
+<tr><td>51</td><td>Hot</td><td>6</td><td>Sudah ada</td></tr>
+<tr><td>52</td><td>Medium</td><td>7</td><td>Sudah ada</td></tr>
+<tr><td>53</td><td>Low</td><td>8</td><td>Sudah ada</td></tr>
+<tr><td>54</td><td>Request Drop TL</td><td>9</td><td>Usulan tambah</td></tr>
+<tr><td>55</td><td>Request Drop Korsal</td><td>10</td><td>Usulan tambah</td></tr>
+<tr><td>56</td><td>Completed Drop</td><td>11</td><td>Usulan tambah</td></tr>
+</tbody></table></div>
 </div></body></html>"></iframe></div>
 <script>
 function go(n){for(var i=1;i<=3;i++){document.getElementById("p"+i).classList.toggle("on",i==n);document.getElementById("b"+i).classList.toggle("on",i==n)}location.hash=n==3?"database":n==2?"specprog":"ui"}
